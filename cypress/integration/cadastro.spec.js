@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+import Cadastro from '../support/pages/Cadastro'
 
 let Chance = require('chance');
 let chance = new Chance();
@@ -11,6 +12,7 @@ context('Cadastro',()=>{
         cy.route('get','**/api/1/databases/userdetails/collections/usertable**').as('getUserTable');
 
         cy.visit('Register.html');
+
         cy.get('input[placeholder="First Name"]').type(chance.first());
         cy.get('input[ng-model^="Last"]').type(chance.last());
         cy.get('input[ng-model^="Email"]').type(chance.email());
@@ -46,4 +48,23 @@ context('Cadastro',()=>{
 
         cy.url().should('contain','WebTable');
     })
+
+    it.only('Cadastro De Usuario no site - PageObjects',()=>{
+        Cadastro.visitCadastro();
+        Cadastro.fillCadastro();
+        Cadastro.saveCadastro();
+
+        cy.wait('@postNewTable').then((response) => {
+            expect(response.status).to.be.equals(200);
+        })
+        cy.wait('@postUserTable').then((response) => {
+            expect(response.status).to.be.equals(200);
+        })
+        cy.wait('@getUserTable').then((response) => {
+            expect(response.status).to.be.equals(200);
+        })
+
+        cy.url().should('contain','WebTable');
+    })
+
 })
